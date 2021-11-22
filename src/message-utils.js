@@ -13,7 +13,14 @@ function messageMentionGuildBot(message) {
   return message?.mentions?.members.has(process.env.CLIENT_ID);
 }
 
+function sendChannelMessage(channel) {
+  return function _sendChannelMessage(message) {
+    channel.send(message);
+  }
+}
+
 module.exports = {
   isMessageFromABot,
   messageMentionGuildBot,
+  sendChannelMessage,
 }
