@@ -1,0 +1,30 @@
+{
+  "name": "guild-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "pm2 start ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xreic/guild-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xreic/guild-bot/issues"
+  },
+  "homepage": "https://github.com/xreic/guild-bot#readme",
+  "dependencies": {
+    "@discordjs/builders": "^0.8.2",
+    "@discordjs/rest": "*",
+    "discord-api-types": "^0.24.0",
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.3.0"
+  }
+}
