@@ -10,7 +10,7 @@ function messageMentionGuildBot(message) {
     throw new Error(`<@${message?.author?.id}> you mentioned the role instead of the bot.`);
   }
 
-  return message?.mentions?.members.has(process.env.CLIENT_ID);
+  return message?.mentions?.members.has(process.env.DISCORD_CLIENT_ID);
 }
 
 function sendChannelMessage(channel) {
