@@ -14,13 +14,24 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', (message) => {
+  // Retrieves the channel where the user sent message resides
   const channel = client.channels.cache.get(message.channelId);
 
   try {
+    // Filters out messages that do not trigger events
     if (isMessageFromABot(message)) return;
-    if (messageMentionGuildBot(message)) console.log('This message mentions the guild bot.');
 
+    channel.send('Wow you did something.');
 
+    /**
+     * For default functionality:
+     *  Record user's scores for Guild Weeklies, Culvert, and Flag Race
+     */
+    if (messageMentionGuildBot(message)) {
+      // Stuff here
+    } else {
+      // Prefixed commands here
+    }
   } catch (errMsg) {
     const parsedErrMsg = String(errMsg).slice(7);
 
