@@ -3,11 +3,7 @@ require('dotenv').config();
 // Require the necessary discord.js classes
 const { Client, Intents } = require('discord.js');
 const { GoogleSheetsClient } = require('./google-sheets-client');
-const {
-  isMessageFromABot,
-  messageMentionGuildBot,
-  sendChannelMessage,
-} = require("./message-utils");
+const messageUtils = require('./message-utils');
 
 // Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
@@ -23,18 +19,18 @@ client.once('ready', () => {
 client.on('messageCreate', (message) => {
   // Retrieves the channel where the user sent message resides
   const channel = client.channels.cache.get(message.channelId);
-  const sendMessageFn = sendChannelMessage(channel);
+  const sendMessageFn = messageUtils.sendChannelMessage(channel);
 
   try {
     // Filters out messages that do not trigger events
-    if (isMessageFromABot(message)) return;
+    if (messageUtils.isMessageFromABot(message)) return;
 
     /**
      * For default functionality:
      *  Record user's scores for Guild Weeklies, Culvert, and Flag Race
      */
-    if (messageMentionGuildBot(message)) {
-      sendMessageFn(message.content)
+    if (messageUtils.messageMentionGuildBot(message)) {
+      sendMessageFn(message.content);
     } else {
       // Prefixed commands here
     }
