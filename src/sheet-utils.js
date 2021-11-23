@@ -1,21 +1,32 @@
 require('dotenv').config();
 
+const flatten = require('lodash/flatten');
 const { googleSheetsClient } = require('./google-sheets-client');
 const { removeGuildBotMention } = require('./utils');
 
-function addUserToSheet() {
-	// Something here
+/**
+ * For accessing a specific sheet in the workbook:
+ * https://stackoverflow.com/questions/53352783/how-to-call-a-specific-sheet-within-a-spreadsheet-via-the-google-sheets-api-v4-i
+ */
+
+async function addUserToSheet(rowIdx, id, username) {
+	const firstRowIdx = 4;
+	const range = `A${firstRowIdx + rowIdx}:B${firstRowIdx + rowIdx}`;
+	const value = [[id, username]];
+	await googleSheetsClient.postBatch(range, value);
 }
 
 async function findUserDiscordID(message) {
-	console.log('\n-------------- findUserDiscordID --------------');
 	const { id, username } = message.author;
 
-	console.log('id:', id);
-	console.log('username:', username);
+	const data = flatten(await googleSheetsClient.get('A4:A'));
+	const idxUserDiscordID = data.indexOf(id) + 1;
 
-	const data = await googleSheetsClient.get('A4:A');
-	console.log('data:', data);
+	/**
+	 * User does not exist in the spreadsheet
+	 * indexOf evaluates to -1, if the target is not found
+	 */
+	if (!idxUserDiscordID) addUserToSheet(idxUserDiscordID, id, username);
 }
 
 /**
