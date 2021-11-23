@@ -23,6 +23,7 @@
     "discord-api-types": "^0.24.0",
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
+    "google-auth-library": "^3.1.2",
     "googleapis": "^39.2.0"
   },
   "devDependencies": {

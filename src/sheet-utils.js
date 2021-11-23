@@ -1,15 +1,21 @@
 require('dotenv').config();
 
-const { ZERO } = require('./constants');
-const { GoogleSheetsClient } = require('./google-sheets-client');
+const { googleSheetsClient } = require('./google-sheets-client');
 const { removeGuildBotMention } = require('./utils');
 
 function addUserToSheet() {
 	// Something here
 }
 
-function findUserDiscordID() {
-	// Something here
+async function findUserDiscordID(message) {
+	console.log('\n-------------- findUserDiscordID --------------');
+	const { id, username } = message.author;
+
+	console.log('id:', id);
+	console.log('username:', username);
+
+	const data = await googleSheetsClient.get('A4:A');
+	console.log('data:', data);
 }
 
 /**
@@ -18,30 +24,14 @@ function findUserDiscordID() {
  *
  * @param {string} content - string of three numbers
  */
-function updateUserScores({ content }) {
-	console.log('\n-------------- updateUserScores --------------');
+async function updateUserScores(message) {
+	const rawUsersScores = removeGuildBotMention(message.content).split(' ').slice(0, 3);
 
-	const splitChar = ' ';
-
-	const rawUsersScores = removeGuildBotMention(content)
-		.split(splitChar)
-		.slice(0, 3);
-
-	let parsedUserScores = [...rawUsersScores];
-
-	const maxLength = 3;
-	if (parsedUserScores.length < maxLength) {
-		const fillerValues = Array(maxLength - parsedUserScores.length).fill(
-			String(ZERO),
-		);
-		parsedUserScores = parsedUserScores.concat(fillerValues);
-	}
-
-	console.log('parsedUserScores:', parsedUserScores);
+	await findUserDiscordID(message);
 }
 
-function updateUserGuildWeeklies() {
-	// Something here
+function updateUserGuildWeeklies(value = 0) {
+	return value;
 }
 
 function updateUserCulvert() {
