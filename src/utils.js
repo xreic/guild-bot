@@ -6,6 +6,12 @@ function findMostRecentSundayDate() {
 	return `${todaysDate.getFullYear()}/${todaysDate.getMonth() + 1}/${todaysDate.getUTCDate() - daysSinceSunday}`;
 }
 
+function generateRange(range) {
+	const sheetName = findMostRecentSundayDate();
+
+	return `${sheetName ? `${sheetName}!` : ''}${range}`;
+}
+
 function removeGuildBotMention(string) {
 	return string.replace('<@!912148184099328100> ', '').trim();
 }
@@ -21,6 +27,7 @@ function shouldMakeNewSpreadsheet(workbook) {
 
 module.exports = {
 	findMostRecentSundayDate,
+	generateRange,
 	removeGuildBotMention,
 	shouldMakeNewSpreadsheet,
 };
