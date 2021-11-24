@@ -15,6 +15,8 @@ const client = new Client({
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 	try {
+		client.user.setActivity('Maplestory with Crowned');
+
 		// Turn the ENV VAR Service Account JSON key into a file for Google Auth to read
 		fs.writeFileSync('./src/keys.json', JSON.stringify(JSON.parse(process.env.CREDENTIALS)));
 		console.log('Ready!');

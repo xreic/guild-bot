@@ -68,7 +68,7 @@ async function updateUserCulvert(rowIdx, value = 0) {
 	await googleSheetsClient.post(cell, insertValue);
 }
 
-async function updateUserFlag(rowIdx, value) {
+async function updateUserFlag(rowIdx, value = 0) {
 	/**
 	 * Throw an error, if the value is not contained within:
 	 * 	['100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000']
