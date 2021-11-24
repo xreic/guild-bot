@@ -2,33 +2,55 @@ require('dotenv').config();
 
 const flatten = require('lodash/flatten');
 const { googleSheetsClient } = require('./google-sheets-client');
-const { removeGuildBotMention, findMostRecentSundayDate } = require('./utils');
+const {
+	generateRange,
+	removeGuildBotMention,
+} = require('./utils');
 
-/**
- * For accessing a specific sheet in the workbook:
- * https://stackoverflow.com/questions/53352783/how-to-call-a-specific-sheet-within-a-spreadsheet-via-the-google-sheets-api-v4-i
- */
+const firstRowId = 2;
 
 async function addUserToSheet(rowId, id, username) {
-	const firstRowId = 4;
-	const range = `A${firstRowId + rowId}:B${firstRowId + rowId}`;
+	const range = generateRange(`A${firstRowId + rowId}:B${firstRowId + rowId}`);
 	const value = [[id, username]];
 	await googleSheetsClient.postBatch(range, value);
 }
 
-async function findUserDiscordID(message) {
+async function findRowUserIsLocated(message) {
 	const { id, username } = message.author;
 
-	const dateString = findMostRecentSundayDate();
-	const data = flatten(await googleSheetsClient.get(`${dateString}!A4:A`));
-	const rowId = data.indexOf(id) + 1;
+	const columnA = `A${firstRowId}:A`;
+	const range = generateRange(columnA);
+
+	// Get all the Discord IDs and usernames within the target sheet
+	const data = flatten(await googleSheetsClient.get(range));
+	const rowIdx = data.indexOf(id);
 
 	/**
 	 * User does not exist in the spreadsheet
 	 * indexOf evaluates to -1, if the target is not found
 	 */
-	if (!rowId) addUserToSheet(rowId, id, username);
-	return rowId;
+	if (rowIdx === -1) addUserToSheet(data.length, id, username);
+	return rowIdx !== -1 ? rowIdx : data.length;
+}
+
+async function updateUserGuildWeeklies({ rowIdx, value }) {
+	// Throw an error if the value is greater than 5
+	// If the value comes in as a negative number, then reset it to 0
+
+	const cell = generateRange(`C${firstRowId + rowIdx}`);
+	await googleSheetsClient.post(cell, value);
+
+	return cell;
+}
+
+// eslint-disable-next-line no-unused-vars
+async function updateUserCulvert({ rowIdx, message, value }) {
+	return 'updateUserCulvert';
+}
+
+// eslint-disable-next-line no-unused-vars
+async function updateUserFlag({ rowIdx, message, value }) {
+	return 'updateUserFlag';
 }
 
 /**
@@ -40,24 +62,21 @@ async function findUserDiscordID(message) {
 async function updateUserScores(message) {
 	const rawUsersScores = removeGuildBotMention(message.content).split(' ').slice(0, 3);
 
-	const rowId = await findUserDiscordID(message);
-}
+	const rowIdx = await findRowUserIsLocated(message);
 
-function updateUserGuildWeeklies(value = 0) {
-	return value;
-}
+	const promises = [
+		updateUserGuildWeeklies({ rowIdx, value: rawUsersScores[0] }),
+		// updateUserCulvert({ rowIdx, value: rawUsersScores[1] }),
+		// updateUserFlag({ rowIdx, value: rawUsersScores[2] }),
+	];
 
-function updateUserCulvert() {
-	// Something here
-}
-
-function updateUserFlag() {
-	// Something here
+	const resolved = await Promise.allSettled(promises);
+	console.log('resolved:', resolved);
 }
 
 module.exports = {
 	addUserToSheet,
-	findUserDiscordID,
+	findRowUserIsLocated,
 	updateUserScores,
 	updateUserGuildWeeklies,
 	updateUserCulvert,
