@@ -39,7 +39,7 @@ class GoogleSheetsClient {
 					{
 						duplicateSheet: {
 							sourceSheetId: 0,
-							newSheetName: findMostRecentSundayDate(),
+							newSheetName: findMostRecentSundayDate()
 						},
 					},
 				],
@@ -75,23 +75,25 @@ class GoogleSheetsClient {
 
 	async post(range, value) {
 		if (!range || !value) return;
+
+		const client = await GoogleSheetsClient.getInstance();
+
+		const resource = { values: [[value]] };
+		await client.spreadsheets.values.update({
+			spreadsheetId,
+			range,
+			valueInputOption: "RAW",
+			resource,
+		});
 	}
 
 	async postBatch(range, values) {
 		if (!range || !values) return;
 
-		const data = [{ range, values }];
-		const resource = { data, valueInputOption: 'RAW' };
+		const client = await GoogleSheetsClient.getInstance();
 
-		try {
-			const client = await GoogleSheetsClient.getInstance();
-
-			await client.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
-
-			return true;
-		} catch (err) {
-			return false;
-		}
+		const resource = { data: [{ range, values }], valueInputOption: 'RAW' };
+		await client.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
 	}
 }
 
