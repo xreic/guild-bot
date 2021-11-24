@@ -33,8 +33,8 @@ async function findRowUserIsLocated(message) {
 	return rowIdx !== -1 ? rowIdx : data.length;
 }
 
-async function updateUserGuildWeeklies(rowIdx, value) {
-	// Convert the user input value into an umber
+async function updateUserGuildWeeklies(rowIdx, value = 0) {
+	// Convert the user input value into a number
 	const convertedValue = +value;
 
 	if (Number.isNaN(convertedValue)) {
@@ -53,11 +53,16 @@ async function updateUserGuildWeeklies(rowIdx, value) {
 	await googleSheetsClient.post(cell, insertValue);
 }
 
-async function updateUserCulvert({ rowIdx, value = 0 }) {
-	if (!_.isInteger(Number(value))) throw new Error(`${value} is not an integer.`);
+async function updateUserCulvert(rowIdx, value = 0) {
+	// Convert the user input value into a number
+	const convertedValue = +value;
+
+	if (Number.isNaN(convertedValue)) {
+		throw new Error(`${value} is not a valid number for this command.`);
+	}
 
 	// If the value comes in as a negative number, then reset it to 0
-	const insertValue = Math.max(value, 0);
+	const insertValue = Math.max(Math.floor(value), 0);
 
 	const cell = generateRange(`D${firstRowId + rowIdx}`);
 	await googleSheetsClient.post(cell, insertValue);
@@ -84,7 +89,7 @@ async function updateUserScores(message) {
 
 	const promises = [
 		updateUserGuildWeeklies(rowIdx, rawUsersScores[0]),
-		// updateUserCulvert({ rowIdx, value: rawUsersScores[1] }),
+		updateUserCulvert(rowIdx, rawUsersScores[1]),
 		// updateUserFlag({ rowIdx, value: rawUsersScores[2] }),
 	];
 
