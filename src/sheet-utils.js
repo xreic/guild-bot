@@ -68,12 +68,24 @@ async function updateUserCulvert(rowIdx, value = 0) {
 	await googleSheetsClient.post(cell, insertValue);
 }
 
-// eslint-disable-next-line no-unused-vars
-async function updateUserFlag({ rowIdx, message, value }) {
+async function updateUserFlag(rowIdx, value) {
 	/**
 	 * Throw an error, if the value is not contained within:
 	 * 	['100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000']
 	 */
+	const possibleFlagScores = ['100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000'];
+	const isScorePossible = possibleFlagScores.indexOf(value) !== -1;
+
+	if (!isScorePossible) throw new Error(`${value} is not a possible flag score.`);
+
+	const cell = generateRange(`E${firstRowId + rowIdx}`);
+
+	/**
+	 * Convert value to a number, because in the "post" method
+	 * 	we do an evaluation of whether or not tha value is a
+	 * 	safe integer (isSafeInteger from lodash)
+	 */
+	await googleSheetsClient.post(cell, +value);
 }
 
 /**
@@ -90,7 +102,7 @@ async function updateUserScores(message) {
 	const promises = [
 		updateUserGuildWeeklies(rowIdx, rawUsersScores[0]),
 		updateUserCulvert(rowIdx, rawUsersScores[1]),
-		// updateUserFlag({ rowIdx, value: rawUsersScores[2] }),
+		updateUserFlag(rowIdx, rawUsersScores[2]),
 	];
 
 	const resolved = await Promise.allSettled(promises);

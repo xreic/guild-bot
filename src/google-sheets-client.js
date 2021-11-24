@@ -88,8 +88,9 @@ class GoogleSheetsClient {
 		});
 	}
 
+	// We just have to trust that the values is done properly
 	async postBatch(range, values) {
-		if (!range || !_.isSafeInteger(value)) return;
+		if (!range || !values) return;
 
 		const client = await GoogleSheetsClient.getInstance();
 
