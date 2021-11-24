@@ -38,6 +38,7 @@
 		"no-trailing-spaces": ["error"],
 		"no-var": "error",
 		"object-curly-spacing": ["error", "always"],
+		"object-curly-newline": "off",
 		"prefer-const": "error",
 		"quotes": ["error", "single"],
 		"semi": ["error", "always"],
