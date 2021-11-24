@@ -2,16 +2,16 @@ require('dotenv').config();
 
 const flatten = require('lodash/flatten');
 const { googleSheetsClient } = require('./google-sheets-client');
-const { removeGuildBotMention } = require('./utils');
+const { removeGuildBotMention, findMostRecentSundayDate } = require('./utils');
 
 /**
  * For accessing a specific sheet in the workbook:
  * https://stackoverflow.com/questions/53352783/how-to-call-a-specific-sheet-within-a-spreadsheet-via-the-google-sheets-api-v4-i
  */
 
-async function addUserToSheet(rowIdx, id, username) {
-	const firstRowIdx = 4;
-	const range = `A${firstRowIdx + rowIdx}:B${firstRowIdx + rowIdx}`;
+async function addUserToSheet(rowId, id, username) {
+	const firstRowId = 4;
+	const range = `A${firstRowId + rowId}:B${firstRowId + rowId}`;
 	const value = [[id, username]];
 	await googleSheetsClient.postBatch(range, value);
 }
@@ -19,14 +19,16 @@ async function addUserToSheet(rowIdx, id, username) {
 async function findUserDiscordID(message) {
 	const { id, username } = message.author;
 
-	const data = flatten(await googleSheetsClient.get('A4:A'));
-	const idxUserDiscordID = data.indexOf(id) + 1;
+	const dateString = findMostRecentSundayDate();
+	const data = flatten(await googleSheetsClient.get(`${dateString}!A4:A`));
+	const rowId = data.indexOf(id) + 1;
 
 	/**
 	 * User does not exist in the spreadsheet
 	 * indexOf evaluates to -1, if the target is not found
 	 */
-	if (!idxUserDiscordID) addUserToSheet(idxUserDiscordID, id, username);
+	if (!rowId) addUserToSheet(rowId, id, username);
+	return rowId;
 }
 
 /**
@@ -38,7 +40,7 @@ async function findUserDiscordID(message) {
 async function updateUserScores(message) {
 	const rawUsersScores = removeGuildBotMention(message.content).split(' ').slice(0, 3);
 
-	await findUserDiscordID(message);
+	const rowId = await findUserDiscordID(message);
 }
 
 function updateUserGuildWeeklies(value = 0) {

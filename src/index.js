@@ -3,7 +3,6 @@ require('dotenv').config();
 // Require the necessary discord.js classes
 const fs = require('fs');
 const { Client, Intents } = require('discord.js');
-const { GoogleSheetsClient } = require('./google-sheets-client');
 const messageUtils = require('./message-utils');
 const sheetUtils = require('./sheet-utils');
 
@@ -18,10 +17,6 @@ client.once('ready', () => {
 	try {
 		// Turn the ENV VAR Service Account JSON key into a file for Google Auth to read
 		fs.writeFileSync('./src/keys.json', JSON.stringify(JSON.parse(process.env.CREDENTIALS)));
-
-		// Initialized the OAuth process and stores the OAuth instance
-		GoogleSheetsClient.getInstance();
-
 		console.log('Ready!');
 	} catch (err) {
 		console.log('\nERROR - client.once - ready');

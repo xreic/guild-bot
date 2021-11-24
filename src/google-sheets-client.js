@@ -2,7 +2,12 @@ require('dotenv').config();
 
 const { GoogleAuth } = require('google-auth-library');
 const { google } = require('googleapis');
+const {
+	findMostRecentSundayDate,
+	shouldMakeNewSpreadsheet
+} = require('./utils');
 
+const spreadsheetId = process.env.SHEET_ID;
 const scopes = ['https://www.googleapis.com/auth/spreadsheets'];
 
 class GoogleSheetsClient {
@@ -25,15 +30,46 @@ class GoogleSheetsClient {
 		return GoogleSheetsClient.instance;
 	}
 
+	async duplicateTemplateSheet() {
+		try {
+			const client = await GoogleSheetsClient.getInstance();
+
+			const resource = {
+				requests: [
+					{
+						duplicateSheet: {
+							sourceSheetId: 0,
+							newSheetName: findMostRecentSundayDate(),
+						},
+					},
+				],
+			};
+
+			await client.spreadsheets.batchUpdate({ spreadsheetId, resource });
+		} catch (err) {
+			console.log('\nERROR - createNewSheet');
+			console.log(err);
+			console.log('-------------------------------------------\n');
+		}
+	}
+
 	async get(range) {
 		if (!range) return;
 
 		const client = await GoogleSheetsClient.getInstance();
-		const { data } = await client.spreadsheets.values.get({
-			spreadsheetId: process.env.SHEET_ID,
-			range
-		});
 
+		/**
+		 * I believe this should be the only instance of having to use "duplicateTemplateSheet",
+		 * 	because the first action for any new sheet in the workbook is always searching
+		 * 	if the user exists in the current week's sheet (done via this method).
+		 *
+		 * 	So if the sheet doesn't exist, then this method will create the new sheet for us
+		 * 		so all further operations do not necessitate the usage of "duplicateTemplateSheet"
+		 */
+		const workbookData = await client.spreadsheets.get({ spreadsheetId });
+		if (shouldMakeNewSpreadsheet(workbookData)) await this.duplicateTemplateSheet();
+
+		const { data } = await client.spreadsheets.values.get({ spreadsheetId, range });
 		return data.values;
 	}
 
@@ -49,10 +85,8 @@ class GoogleSheetsClient {
 
 		try {
 			const client = await GoogleSheetsClient.getInstance();
-			await client.spreadsheets.values.batchUpdate({
-				spreadsheetId: process.env.SHEET_ID,
-				resource
-			});
+
+			await client.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
 
 			return true;
 		} catch (err) {
