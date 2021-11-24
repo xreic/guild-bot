@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const { GoogleAuth } = require('google-auth-library');
 const { google } = require('googleapis');
+const _ = require('lodash');
 const {
 	findMostRecentSundayDate,
 	shouldMakeNewSpreadsheet
@@ -74,7 +75,7 @@ class GoogleSheetsClient {
 	}
 
 	async post(range, value) {
-		if (!range || !value) return;
+		if (!range || !_.isSafeInteger(value)) return;
 
 		const client = await GoogleSheetsClient.getInstance();
 
@@ -88,7 +89,7 @@ class GoogleSheetsClient {
 	}
 
 	async postBatch(range, values) {
-		if (!range || !values) return;
+		if (!range || !_.isSafeInteger(value)) return;
 
 		const client = await GoogleSheetsClient.getInstance();
 

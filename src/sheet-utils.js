@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const flatten = require('lodash/flatten');
+const _ = require('lodash');
 const { googleSheetsClient } = require('./google-sheets-client');
 const {
 	generateRange,
@@ -22,7 +22,7 @@ async function findRowUserIsLocated(message) {
 	const range = generateRange(columnA);
 
 	// Get all the Discord IDs and usernames within the target sheet
-	const data = flatten(await googleSheetsClient.get(range));
+	const data = _.flatten(await googleSheetsClient.get(range));
 	const rowIdx = data.indexOf(id);
 
 	/**
@@ -33,24 +33,42 @@ async function findRowUserIsLocated(message) {
 	return rowIdx !== -1 ? rowIdx : data.length;
 }
 
-async function updateUserGuildWeeklies({ rowIdx, value }) {
-	// Throw an error if the value is greater than 5
+async function updateUserGuildWeeklies(rowIdx, value) {
+	// Convert the user input value into an umber
+	const convertedValue = +value;
+
+	if (Number.isNaN(convertedValue)) {
+		throw new Error(`${value} is not a valid number for this command. Please use an integer between 1 - 5.`);
+	}
+
+	// Users should not be able to enter an amount that is greater than the weekly max (5)
+	if (convertedValue > 5) {
+		throw new Error(`${value} is greater than the max amount of weekly mission points you can accrue in one week.`);
+	}
+
 	// If the value comes in as a negative number, then reset it to 0
+	const insertValue = Math.max(Math.floor(convertedValue), 0);
 
 	const cell = generateRange(`C${firstRowId + rowIdx}`);
-	await googleSheetsClient.post(cell, value);
-
-	return cell;
+	await googleSheetsClient.post(cell, insertValue);
 }
 
-// eslint-disable-next-line no-unused-vars
-async function updateUserCulvert({ rowIdx, message, value }) {
-	return 'updateUserCulvert';
+async function updateUserCulvert({ rowIdx, value = 0 }) {
+	if (!_.isInteger(Number(value))) throw new Error(`${value} is not an integer.`);
+
+	// If the value comes in as a negative number, then reset it to 0
+	const insertValue = Math.max(value, 0);
+
+	const cell = generateRange(`D${firstRowId + rowIdx}`);
+	await googleSheetsClient.post(cell, insertValue);
 }
 
 // eslint-disable-next-line no-unused-vars
 async function updateUserFlag({ rowIdx, message, value }) {
-	return 'updateUserFlag';
+	/**
+	 * Throw an error, if the value is not contained within:
+	 * 	['100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000']
+	 */
 }
 
 /**
@@ -65,7 +83,7 @@ async function updateUserScores(message) {
 	const rowIdx = await findRowUserIsLocated(message);
 
 	const promises = [
-		updateUserGuildWeeklies({ rowIdx, value: rawUsersScores[0] }),
+		updateUserGuildWeeklies(rowIdx, rawUsersScores[0]),
 		// updateUserCulvert({ rowIdx, value: rawUsersScores[1] }),
 		// updateUserFlag({ rowIdx, value: rawUsersScores[2] }),
 	];
