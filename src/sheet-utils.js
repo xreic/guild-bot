@@ -68,12 +68,16 @@ async function updateUserCulvert(rowIdx, value = 0) {
 	await googleSheetsClient.post(cell, insertValue);
 }
 
-async function updateUserFlag(rowIdx, value = 0) {
+/**
+ * We use a string value for the default value, because
+ * 	we're searching for the number string instead
+ */
+async function updateUserFlag(rowIdx, value = '0') {
 	/**
 	 * Throw an error, if the value is not contained within:
-	 * 	['100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000']
+	 * 	['0', '100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000']
 	 */
-	const possibleFlagScores = ['100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000'];
+	const possibleFlagScores = ['0', '100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000'];
 	const isScorePossible = possibleFlagScores.indexOf(value) !== -1;
 
 	if (!isScorePossible) throw new Error(`${value} is not a possible flag score.`);
@@ -105,8 +109,8 @@ async function updateUserScores(message) {
 		updateUserFlag(rowIdx, rawUsersScores[2]),
 	];
 
-	const resolved = await Promise.allSettled(promises);
-	console.log('resolved:', resolved);
+	const resolvedPromises = await Promise.allSettled(promises);
+	return resolvedPromises.every((resolution) => resolution.status === 'fulfilled');
 }
 
 module.exports = {
