@@ -19,7 +19,8 @@ async function updateWeekliesCommand(discordMessage) {
 		await sheetUtils.updateUserGuildWeeklies(rowIdx, value);
 		await executePostRequestActions(true, discordMessage);
 	} catch (err) {
-		await executePostRequestActions(false, discordMessage, String(err));
+		const forcedMessage = String(err).replace('Error: ', '');
+		await executePostRequestActions(false, discordMessage, forcedMessage);
 	}
 }
 
@@ -32,7 +33,8 @@ async function updateCulvertCommand(discordMessage) {
 		await sheetUtils.updateUserCulvert(rowIdx, value);
 		await executePostRequestActions(true, discordMessage);
 	} catch (err) {
-		await executePostRequestActions(false, discordMessage, String(err));
+		const forcedMessage = String(err).replace('Error: ', '');
+		await executePostRequestActions(false, discordMessage, forcedMessage);
 	}
 }
 
@@ -50,7 +52,8 @@ async function updateFlagCommand(discordMessage) {
 		await sheetUtils.updateUserFlag(rowIdx, value);
 		await executePostRequestActions(true, discordMessage);
 	} catch (err) {
-		await executePostRequestActions(false, discordMessage, String(err));
+		const forcedMessage = String(err).replace('Error: ', '');
+		await executePostRequestActions(false, discordMessage, forcedMessage);
 	}
 }
 

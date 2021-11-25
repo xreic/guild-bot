@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const flatten = require('lodash/flatten');
+const _ = require('lodash');
 const { googleSheetsClient } = require('./google-sheets-client');
 const { generateRange, removeGuildBotMention } = require('./utils');
 
@@ -19,7 +19,7 @@ async function findRowUserIsLocated(message) {
 	const range = generateRange(columnA);
 
 	// Get all the Discord IDs and usernames within the target sheet
-	const data = flatten(await googleSheetsClient.get(range));
+	const data = _.flatten(await googleSheetsClient.get(range));
 	const rowIdx = data.indexOf(id);
 
 	/**

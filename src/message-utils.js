@@ -1,5 +1,4 @@
 async function executePostRequestActions(isRequestSuccessful, discordMessage, message) {
-	const thrownErrorMessage = message?.replace('Error: ', '');
 	const replyMessage = isRequestSuccessful ?
 		[
 			'Your score(s) have been recorded.',
@@ -14,7 +13,7 @@ async function executePostRequestActions(isRequestSuccessful, discordMessage, me
 
 	await Promise.allSettled([
 		discordMessage.react(isRequestSuccessful ? '✅' : '❌'),
-		discordMessage.reply(thrownErrorMessage || replyMessage),
+		discordMessage.reply(message || replyMessage),
 	]);
 }
 
