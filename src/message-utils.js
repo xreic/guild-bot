@@ -1,4 +1,13 @@
-require('dotenv').config();
+async function executePostRequestActions(isRequestSuccessful, message) {
+	const replyMessage = isRequestSuccessful ?
+		'Your scores have been recorded.\nYou can double check the spreadsheet if you want.\nSee the channel topic for the URL.' :
+		'An issue was encountered while recording your scores.\nPlease check the spreadsheet for any issues.\n`!weeklies`, `!culvert`, or `!flag` to fix a specific score or retry the message.';
+
+	await Promise.allSettled([
+		message.react(isRequestSuccessful ? '✅' : '❌'),
+		message.reply(replyMessage),
+	]);
+}
 
 function isMessageFromABot(message) {
 	return message?.author?.bot;
@@ -12,14 +21,8 @@ function messageMentionGuildBot(message) {
 	return message?.mentions?.members.has(process.env.DISCORD_CLIENT_ID);
 }
 
-function sendChannelMessage(channel) {
-	return function _sendChannelMessage(message) {
-		channel.send(message);
-	};
-}
-
 module.exports = {
+	executePostRequestActions,
 	isMessageFromABot,
 	messageMentionGuildBot,
-	sendChannelMessage,
 };

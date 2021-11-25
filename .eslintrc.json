@@ -37,6 +37,7 @@
 		"no-tabs": "off",
 		"no-trailing-spaces": ["error"],
 		"no-var": "error",
+		"operator-linebreak": "off",
 		"object-curly-spacing": ["error", "always"],
 		"object-curly-newline": "off",
 		"prefer-const": "error",
