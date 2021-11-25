@@ -1,11 +1,8 @@
 require('dotenv').config();
 
-const _ = require('lodash');
+const flatten = require('lodash/flatten');
 const { googleSheetsClient } = require('./google-sheets-client');
-const {
-	generateRange,
-	removeGuildBotMention,
-} = require('./utils');
+const { generateRange, removeGuildBotMention } = require('./utils');
 
 const firstRowId = 2;
 
@@ -22,7 +19,7 @@ async function findRowUserIsLocated(message) {
 	const range = generateRange(columnA);
 
 	// Get all the Discord IDs and usernames within the target sheet
-	const data = _.flatten(await googleSheetsClient.get(range));
+	const data = flatten(await googleSheetsClient.get(range));
 	const rowIdx = data.indexOf(id);
 
 	/**
@@ -33,17 +30,17 @@ async function findRowUserIsLocated(message) {
 	return rowIdx !== -1 ? rowIdx : data.length;
 }
 
-async function updateUserGuildWeeklies(rowIdx, value = 0) {
+async function updateUserGuildWeeklies(rowIdx, value = '0') {
 	// Convert the user input value into a number
 	const convertedValue = +value;
 
 	if (Number.isNaN(convertedValue)) {
-		throw new Error(`${value} is not a valid number for this command. Please use an integer between 1 - 5.`);
+		throw new Error(`\`${value}\` is not valid for this command. Please enter a number between 1 - 5.`);
 	}
 
 	// Users should not be able to enter an amount that is greater than the weekly max (5)
 	if (convertedValue > 5) {
-		throw new Error(`${value} is greater than the max amount of weekly mission points you can accrue in one week.`);
+		throw new Error(`\`${value}\` is greater than the max (5) amount of weekly mission points you can accrue in one week.`);
 	}
 
 	// If the value comes in as a negative number, then reset it to 0
@@ -53,12 +50,12 @@ async function updateUserGuildWeeklies(rowIdx, value = 0) {
 	await googleSheetsClient.post(cell, insertValue);
 }
 
-async function updateUserCulvert(rowIdx, value = 0) {
+async function updateUserCulvert(rowIdx, value = '0') {
 	// Convert the user input value into a number
 	const convertedValue = +value;
 
 	if (Number.isNaN(convertedValue)) {
-		throw new Error(`${value} is not a valid number for this command.`);
+		throw new Error(`\`${value}\` is not valid for this command. Please enter a number.`);
 	}
 
 	// If the value comes in as a negative number, then reset it to 0
@@ -80,7 +77,13 @@ async function updateUserFlag(rowIdx, value = '0') {
 	const possibleFlagScores = ['0', '100', '200', '250', '300', '350', '400', '450', '550', '650', '800', '1000'];
 	const isScorePossible = possibleFlagScores.indexOf(value) !== -1;
 
-	if (!isScorePossible) throw new Error(`${value} is not a possible flag score.`);
+	if (!isScorePossible) {
+		throw new Error([
+			`\`${value}\` is not a possible flag score.`,
+			'Please enter a value from the following:',
+			'0, 100, 200, 250, 300, 350, 400, 450, 550, 650, 800, 1000',
+		].join('\n'));
+	}
 
 	const cell = generateRange(`E${firstRowId + rowIdx}`);
 

@@ -5,6 +5,7 @@ const fs = require('fs');
 const { Client, Intents } = require('discord.js');
 const messageUtils = require('./message-utils');
 const sheetUtils = require('./sheet-utils');
+const { botCommands } = require('./commands');
 
 // Create a new client instance
 const client = new Client({
@@ -30,29 +31,30 @@ client.once('ready', () => {
 	}
 });
 
-client.on('messageCreate', async (message) => {
+client.on('messageCreate', async (discordMessage) => {
 	try {
 		// Filters out messages that do not trigger events
-		if (messageUtils.isMessageFromABot(message)) return;
+		if (messageUtils.isMessageFromABot(discordMessage)) return;
 
 		/**
 		 * For default functionality:
 		 *  Record user's scores for Guild Weeklies, Culvert, and Flag Race
 		 */
-		if (messageUtils.messageMentionGuildBot(message)) {
-			const success = await sheetUtils.updateUserScores(message);
-			await messageUtils.executePostRequestActions(success, message);
+		if (messageUtils.messageMentionGuildBot(discordMessage)) {
+			const success = await sheetUtils.updateUserScores(discordMessage);
+			await messageUtils.executePostRequestActions(success, discordMessage);
 		} else {
 			// Only do something, if the message has the command prefix (!)
-			if (message.content[0] !== '!') return;
+			if (discordMessage.content[0] !== '!') return;
 
-			// Prefixed commands here
-			console.log('\n-------------- Commands --------------');
-			const command = message.content.split(' ')[0];
-			console.log('command:', command);
+			// Retrieve the prefixed command
+			const command = discordMessage.content.split(' ')[0];
+			if (botCommands[command]) await botCommands[command](discordMessage);
 		}
 	} catch (errMsg) {
-		console.log('\n-------------- messageCreate - ERROR --------------');
+		console.log('\n\n------------------');
+		console.log(`${discordMessage.author.username} (Discord ID: ${discordMessage.author.id}) triggered an error with:`);
+		console.log(discordMessage.content);
 		console.log(errMsg);
 	}
 });
