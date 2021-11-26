@@ -1,4 +1,7 @@
+# Sensitive information
 .env
+src/keys.json
+
+# Pacakages
 package-lock.json
 node_modules/
-src/keys.json

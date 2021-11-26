@@ -52,7 +52,7 @@ function messageMentionsBot(message) {
 
 async function reportErrorsInThread(discordMessage) {
 	const thread = await discordMessage.startThread({ name: 'Command Issue', autoArchiveDuration: 60 });
-	await thread.send(`<@${process.env.ADMIN_DISCORD_ID}>\nThis message caused an error`);
+	await thread.send(`<@${process.env.ADMIN_ID}>\nThis message caused an error`);
 }
 
 module.exports = {
