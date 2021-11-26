@@ -31,3 +31,4 @@ To fix this, you're going to need to:
 
 - [Discord.js](https://discordjs.guide/#before-you-begin)
 - [Sheets API](https://developers.google.com/sheets/api/reference/rest)
+- [PM2 + Heroku](https://pm2.keymetrics.io/docs/integrations/heroku/#using-pm2-with-heroku)

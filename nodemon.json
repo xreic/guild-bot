@@ -1,6 +1,4 @@
 {
-  "events": {
-    "start": "clear"
-  },
+  "events": { "start": "clear" },
 	"ignore": ["./src/keys.json"]
 }

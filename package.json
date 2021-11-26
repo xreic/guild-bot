@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
-	"engines": {
-		"node": "16.x"
-	},
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "start": "pm2 start --no-daemon ecosystem.config.js"
   },
@@ -36,7 +36,6 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.1"
+    "eslint-plugin-prettier": "^4.0.0"
   }
 }
