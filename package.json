@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint"
+    "start": "pm2-runtime start ecosystem.config.js"
   },
   "repository": {
     "type": "git",
