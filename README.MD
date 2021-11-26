@@ -12,6 +12,7 @@ Just a simple Discord bot to make my life easier
 4. Make a copy of this [spreadsheet](https://docs.google.com/spreadsheets/d/1jvomrR7UV2XzH-xasM-Jduw0CzCIgFUwsxMNeZuXzZM/edit#gid=0)
    1. Delete whatever existing sheets are in your dupe afterwards.
    2. Share `editor` access with your **SERVICE ACCOUNT** email
+   3. Also, if you don't want the marbles stuff, then you'll have to delete those colums and edit the `retrieveWeeklyScore` function to not look for and consume that data.
 5. Create an `.env` from the `.env.sample` (if you need to)
 	 1. For the `CREDENTIALS` env var, just squish your key JSON into one line and throw it in there
 7. Deploy on Heroku or whatever service you want
