@@ -2,7 +2,7 @@ const defaultReplyMessages = {
 	defaultSuccess: [
 		'Your score(s) have been recorded.',
 		'You can double check the spreadsheet if you want.',
-		'https://docs.google.com/spreadsheets/d/1jvomrR7UV2XzH-xasM-Jduw0CzCIgFUwsxMNeZuXzZM',
+		`${process.env.SHEET_URL}`,
 	],
 	defaultFailure: [
 		'An issue was encountered while recording your score(s).',
