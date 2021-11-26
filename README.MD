@@ -8,12 +8,13 @@ Just a simple Discord bot to make my life easier
 2. [Setup your bot with the proper permission](https://discordjs.guide/preparations/setting-up-a-bot-application.html)
    1. ![Image of permissions](https://user-images.githubusercontent.com/32492656/143509311-3a18fa7d-c2f9-452f-8e2d-85dac80c376b.png)
 3. [Setup your Sheet API Service Account](https://developers.google.com/workspace/guides/create-credentials)
-   1. You're going to need to make a **SERVICE ACCOUNT** to interact with the Sheets API.
+   1. You're going to need to make a **SERVICE ACCOUNT** to interact with the Sheets API, when it asks for permissions give it **EDITOR**.
 4. Make a copy of this [spreadsheet](https://docs.google.com/spreadsheets/d/1jvomrR7UV2XzH-xasM-Jduw0CzCIgFUwsxMNeZuXzZM/edit#gid=0)
    1. Delete whatever existing sheets are in your dupe afterwards.
    2. Share `editor` access with your **SERVICE ACCOUNT** email
 5. Create an `.env` from the `.env.sample` (if you need to)
-6. Deploy on Heroku or whatever service you want
+	 1. For the `CREDENTIALS` env var, just squish your key JSON into one line and throw it in there
+7. Deploy on Heroku or whatever service you want
    1. Setup env vars, if you need to
 
 ## [Deploying on Heroku](https://dashboard.heroku.com)
@@ -28,4 +29,4 @@ To fix this, you're going to need to:
 ## APIs and Libraries and Stuff
 
 - [Discord.js](https://discordjs.guide/#before-you-begin)
-- [Sheets API](https://developers.google.com/sheets)
+- [Sheets API](https://developers.google.com/sheets/api/reference/rest)
