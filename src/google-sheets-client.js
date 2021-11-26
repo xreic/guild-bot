@@ -1,11 +1,9 @@
-require('dotenv').config();
-
 const { GoogleAuth } = require('google-auth-library');
 const { google } = require('googleapis');
 const _ = require('lodash');
 const {
-	findMostRecentSundayDate,
-	shouldMakeNewSpreadsheet
+	calcSundayOfWeek,
+	shouldMakeNewSpreadsheet,
 } = require('./utils');
 
 const spreadsheetId = process.env.SHEET_ID;
@@ -40,7 +38,7 @@ class GoogleSheetsClient {
 					{
 						duplicateSheet: {
 							sourceSheetId: 0,
-							newSheetName: findMostRecentSundayDate()
+							newSheetName: calcSundayOfWeek()
 						},
 					},
 				],
@@ -72,6 +70,14 @@ class GoogleSheetsClient {
 
 		const { data } = await client.spreadsheets.values.get({ spreadsheetId, range });
 		return data.values;
+	}
+
+	async batchGet(ranges) {
+		if (!ranges) return;
+
+		const client = await GoogleSheetsClient.getInstance();
+		const { data } = await client.spreadsheets.values.batchGet({ spreadsheetId, ranges });
+		return data;
 	}
 
 	async post(range, value) {

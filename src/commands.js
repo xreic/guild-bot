@@ -1,47 +1,75 @@
-const { executePostRequestActions } = require('./message-utils');
-const sheetUtils = require('./sheet-utils');
+const { executeBotResponses } = require('./message-utils');
+const sheetUtils = require('./spreadsheet-operations');
 
-async function retrieveArgs(discordMessage) {
-	const rowIdx = await sheetUtils.findRowUserIsLocated(discordMessage);
+/**
+ * Function to remove the repetitiveness of having to get the
+ * 	row of the user and the possible arguments to other functions
+ *
+ * @param {Message} message Discord message the user sent
+ */
+async function retrieveArgs(message) {
+	const rowIdx = await sheetUtils.findRowUserIsLocated(message);
 
-	// Assume that the format of the command is: !weeklies 5
-	const value = discordMessage.content.split(' ')[1];
+	/**
+	 * Assume that the format of the command is: !<COMMAND> <VALUE>
+	 * See "commandMap" for available commands
+	 */
+	const value = message.content.split(' ')[1];
 
 	return { rowIdx, value };
 }
 
+/**
+ * Updates the user's weekly mission points for the week
+ *
+ * No plans on adding the functionality to change other weeks just
+ * 	because guild members are dumb
+ *
+ * @param {Message} discordMessage Discord message the user sent
+ */
 async function updateWeekliesCommand(discordMessage) {
 	try {
 		const { rowIdx, value } = await retrieveArgs(discordMessage);
-
-		if (value === null || value === undefined) throw new Error('Please enter a number (1 - 5).');
+		if (value === null || value === undefined) throw new Error('Please enter a number (0 - 5).');
 
 		await sheetUtils.updateUserGuildWeeklies(rowIdx, value);
-		await executePostRequestActions(true, discordMessage);
+		await executeBotResponses(true, discordMessage);
 	} catch (err) {
-		const forcedMessage = String(err).replace('Error: ', '');
-		await executePostRequestActions(false, discordMessage, forcedMessage);
+		await executeBotResponses(false, discordMessage, err);
 	}
 }
 
+/**
+ * Updates the user's culvert score for the week
+ *
+ * No plans on adding the functionality to change other weeks just
+ * 	because guild members are dumb
+ *
+ * @param {Message} discordMessage Discord message the user sent
+ */
 async function updateCulvertCommand(discordMessage) {
 	try {
 		const { rowIdx, value } = await retrieveArgs(discordMessage);
-
 		if (value === null || value === undefined) throw new Error('Please enter a number.');
 
 		await sheetUtils.updateUserCulvert(rowIdx, value);
-		await executePostRequestActions(true, discordMessage);
+		await executeBotResponses(true, discordMessage);
 	} catch (err) {
-		const forcedMessage = String(err).replace('Error: ', '');
-		await executePostRequestActions(false, discordMessage, forcedMessage);
+		await executeBotResponses(false, discordMessage, err);
 	}
 }
 
+/**
+ * Updates the user's flag race score for the week
+ *
+ * No plans on adding the functionality to change other weeks just
+ * 	because guild members are dumb
+ *
+ * @param {Message} discordMessage Discord message the user sent
+ */
 async function updateFlagCommand(discordMessage) {
 	try {
 		const { rowIdx, value } = await retrieveArgs(discordMessage);
-
 		if (value === null || value === undefined) {
 			throw new Error([
 				'Please enter a number from the following:',
@@ -50,10 +78,43 @@ async function updateFlagCommand(discordMessage) {
 		}
 
 		await sheetUtils.updateUserFlag(rowIdx, value);
-		await executePostRequestActions(true, discordMessage);
+		await executeBotResponses(true, discordMessage);
 	} catch (err) {
-		const forcedMessage = String(err).replace('Error: ', '');
-		await executePostRequestActions(false, discordMessage, forcedMessage);
+		await executeBotResponses(false, discordMessage, err);
+	}
+}
+
+/**
+ * Updates the user's weekly mission points for the week
+ *
+ * No plans on adding the functionality to change other weeks just
+ * 	because guild members are dumb
+ *
+ * @param {Message} discordMessage Discord message the user sent
+ */
+async function retrieveWeeklyScore(discordMessage) {
+	try {
+		const possibleDateArg = discordMessage.content.split(' ')[1];
+
+		const rowIdx = await sheetUtils.findRowUserIsLocated(discordMessage, possibleDateArg);
+
+		const data = await sheetUtils.retrieveUserData(rowIdx, possibleDateArg);
+
+		const replyMessage = [
+			'Your scores for the week are:',
+			`Weekly Mission Points: ${data[0]}`,
+			`Culvert: ${data[1]}`,
+			`Flag: ${data[2]}`,
+			`Marbles: ${data[3]} (\`!raffle\`)`,
+		];
+		await executeBotResponses(true, discordMessage, replyMessage);
+	} catch (err) {
+		const replyMessage = [
+			'There was an issue retrieving your score.',
+			'If you entered a date, then make sure that the date is correct and in the right format:',
+			'MM/DD/YY or MM/DD/YYYY',
+		];
+		await executeBotResponses(false, discordMessage, replyMessage);
 	}
 }
 
@@ -61,6 +122,7 @@ const commandMap = {
 	'!weeklies': updateWeekliesCommand,
 	'!culvert': updateCulvertCommand,
 	'!flag': updateFlagCommand,
+	'!score': retrieveWeeklyScore,
 };
 
 module.exports = {

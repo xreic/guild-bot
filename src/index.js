@@ -3,9 +3,13 @@ require('dotenv').config();
 const fs = require('fs');
 // Require the necessary discord.js classes
 const { Client, Intents } = require('discord.js');
-const messageUtils = require('./message-utils');
-const sheetUtils = require('./sheet-utils');
 const { botCommands } = require('./commands');
+const {
+	executeBotResponses,
+	messageMentionsBot,
+	reportErrorsInThread,
+} = require('./message-utils');
+const { updateUserScores } = require('./spreadsheet-operations');
 
 // Create a new client instance
 const client = new Client({
@@ -33,29 +37,30 @@ client.once('ready', () => {
 
 client.on('messageCreate', async (discordMessage) => {
 	try {
-		// Filters out messages that do not trigger events
-		if (messageUtils.isMessageFromABot(discordMessage)) return;
+		/**
+		 * Ignored messages:
+		 * 	1. Bot messages
+		 */
+		if (discordMessage.author.bot) return;
 
 		/**
-		 * For default functionality:
+		 * For default functionality: @bot <WEEKLY MISSION POINTS> <CULVERT> <FLAG>
 		 *  Record user's scores for Guild Weeklies, Culvert, and Flag Race
 		 */
-		if (messageUtils.messageMentionGuildBot(discordMessage)) {
-			const success = await sheetUtils.updateUserScores(discordMessage);
-			await messageUtils.executePostRequestActions(success, discordMessage);
+		if (messageMentionsBot(discordMessage)) {
+			const success = await updateUserScores(discordMessage);
+			await executeBotResponses(success, discordMessage);
 		} else {
-			// Only do something, if the message has the command prefix (!)
-			if (discordMessage.content[0] !== '!') return;
-
 			// Retrieve the prefixed command
 			const command = discordMessage.content.split(' ')[0];
 			if (botCommands[command]) await botCommands[command](discordMessage);
 		}
 	} catch (errMsg) {
-		console.log('\n\n------------------');
 		console.log(`${discordMessage.author.username} (Discord ID: ${discordMessage.author.id}) triggered an error with:`);
 		console.log(discordMessage.content);
 		console.log(errMsg);
+
+		await reportErrorsInThread(discordMessage, errMsg);
 	}
 });
 
