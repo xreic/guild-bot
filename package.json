@@ -4,7 +4,11 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
+<<<<<<< Updated upstream
     "start": "pm2-runtime start ecosystem.config.js"
+=======
+    "start": "node ./src/index.js"
+>>>>>>> Stashed changes
   },
   "repository": {
     "type": "git",
