@@ -152,7 +152,7 @@ async function updateUserScores(message) {
 	 * 		Weekly mission points, culvert, and flag
 	 */
 	const rawUsersScores = message.content
-		.replace('<@!912148184099328100> ', '')
+		.replace(`<@!${process.env.DISCORD_CLIENT_ID}> `, '')
 		.trim()
 		.split(' ')
 		.slice(0, 3);
