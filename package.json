@@ -7,7 +7,7 @@
 		"node": "16.x"
 	},
   "scripts": {
-    "start": "node ./src/index.js"
+    "start": "pm2 start --no-daemon ecosystem.config.js"
   },
   "repository": {
     "type": "git",
