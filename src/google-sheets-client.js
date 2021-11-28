@@ -2,7 +2,7 @@ const { GoogleAuth } = require('google-auth-library');
 const { google } = require('googleapis');
 const _ = require('lodash');
 const {
-	calcSundayOfWeek,
+	getUTCMondayOfWeekFromDate,
 	shouldMakeNewSpreadsheet,
 } = require('./utils');
 
@@ -38,7 +38,7 @@ class GoogleSheetsClient {
 					{
 						duplicateSheet: {
 							sourceSheetId: 0,
-							newSheetName: calcSundayOfWeek()
+							newSheetName: getUTCMondayOfWeekFromDate()
 						},
 					},
 				],
@@ -102,6 +102,14 @@ class GoogleSheetsClient {
 
 		const resource = { data: [{ range, values }], valueInputOption: 'RAW' };
 		await client.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
+	}
+
+	// Clears the range specified
+	async clearSheet(range) {
+		if (!range) return;
+
+		const client = await GoogleSheetsClient.getInstance();
+		await client.spreadsheets.values.clear({ spreadsheetId, range, resource: {} });
 	}
 }
 

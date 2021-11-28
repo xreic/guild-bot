@@ -27,7 +27,7 @@ async function retrieveArgs(message) {
  *
  * @param {Message} discordMessage Discord message the user sent
  */
-async function updateWeekliesCommand(discordMessage) {
+async function updateWeeklyCommand(discordMessage) {
 	try {
 		const { rowIdx, value } = await retrieveArgs(discordMessage);
 		if (value === null || value === undefined) throw new Error('Please enter a number (0 - 5).');
@@ -84,45 +84,10 @@ async function updateFlagCommand(discordMessage) {
 	}
 }
 
-/**
- * Updates the user's weekly mission points for the week
- *
- * No plans on adding the functionality to change other weeks just
- * 	because guild members are dumb
- *
- * @param {Message} discordMessage Discord message the user sent
- */
-async function retrieveWeeklyScore(discordMessage) {
-	try {
-		const possibleDateArg = discordMessage.content.split(' ')[1];
-
-		const rowIdx = await sheetUtils.findRowUserIsLocated(discordMessage, possibleDateArg);
-
-		const data = await sheetUtils.retrieveUserData(rowIdx, possibleDateArg);
-
-		const replyMessage = [
-			'Your scores for the week are:',
-			`Weekly Mission Points: ${data[0]}`,
-			`Culvert: ${data[1]}`,
-			`Flag: ${data[2]}`,
-			`Marbles: ${data[3]} (\`!raffle\`)`,
-		];
-		await executeBotResponses(true, discordMessage, replyMessage);
-	} catch (err) {
-		const replyMessage = [
-			'There was an issue retrieving your score.',
-			'If you entered a date, then make sure that the date is correct and in the right format:',
-			'MM/DD/YY or MM/DD/YYYY',
-		];
-		await executeBotResponses(false, discordMessage, replyMessage);
-	}
-}
-
 async function printRaffleDetails(discordMessage) {
 	const raffleDetails = [
 		'We hold a monthly raffle with entries based on your participation.',
 		'The prizes are **20K, 10K, and 10K NX** for **1st, 2nd, and 3rd place in marbles**.',
-		'',
 		'Culvert: 1 marble',
 		'Flag Race: 1 marble per 100 points',
 		'Weekly Mission Points: 1 marble per 2 WMP, 5 WMP = 4 marbles',
@@ -131,12 +96,30 @@ async function printRaffleDetails(discordMessage) {
 	await discordMessage.reply(raffleDetails);
 }
 
+async function generateMarblesCSV(discordMessage) {
+	const validUser = discordMessage.member.roles.cache.some(
+		(role) => role.name === process.env.ADMIN_ROLE,
+	);
+
+	// eslint-disable-next-line no-unused-vars
+	const [_, start, end] = discordMessage.content.split(' ');
+
+	if (!validUser || !start || !end) await executeBotResponses(false, discordMessage, []);
+
+	try {
+		await sheetUtils.updateMarbleSheet(start, end);
+		await executeBotResponses(true, discordMessage, []);
+	} catch (err) {
+		await executeBotResponses(false, discordMessage, []);
+	}
+}
+
 const commandMap = {
-	'!weeklies': updateWeekliesCommand,
+	'!weekly': updateWeeklyCommand,
 	'!culvert': updateCulvertCommand,
 	'!flag': updateFlagCommand,
-	'!score': retrieveWeeklyScore,
 	'!raffle': printRaffleDetails,
+	'!marbles': generateMarblesCSV,
 };
 
 module.exports = {
