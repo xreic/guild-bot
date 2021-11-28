@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { googleSheetsClient } = require('./google-sheets-client');
-const { generateSheetRange } = require('./utils');
+const { generateSheetRange, getAllUTCMondaysBetweenWeeks } = require('./utils');
 
 /**
  * Adds the author of the message to the spreadsheet
@@ -169,24 +169,30 @@ async function updateUserScores(message) {
 	return resolvedPromises.every((resolution) => resolution.status === 'fulfilled');
 }
 
-/**
- * Gets the Weekly Mission Points, Culvert score, and Flag race score
- * 	of a week for the user
- *
- * @param {*} row the row for the user whose information is being retrieved
- * @param {*} possibleDate a day in the week where the user wants to retrieve information from
- */
-async function retrieveUserData(row, possibleDate) {
-	try {
-		const ranges = generateSheetRange([`C${row}:E${row}`, `I${row}`], possibleDate);
+async function updateMarbleSheet(startDate = new Date(), endDate = new Date()) {
+	const sheets = getAllUTCMondaysBetweenWeeks(startDate, endDate);
+	const ranges = sheets.map((sheet) => generateSheetRange(['B2:B', 'H2:H'], sheet));
+	const { valueRanges } = await googleSheetsClient.batchGet(ranges);
 
-		const rawData = await googleSheetsClient.batchGet(ranges);
-		const data = rawData.valueRanges.map((range) => range.values);
+	const chunkedRanges = _.chunk(valueRanges.map((range) => range.values), 2);
 
-		return _.flattenDeep(data);
-	} catch (err) {
-		throw new Error('The scores you are looking for do not exist.');
+	const marbleEntriesSheetData = [];
+
+	for (let i = 0; i < chunkedRanges.length; i += 1) {
+		const [users, marblesPerUser] = chunkedRanges[i];
+
+		for (let j = 0; j < users.length; j += 1) {
+			const user = users[j][0];
+			const marblesForUser = Number(marblesPerUser[j][0]) || 0;
+
+			const list = Array(marblesForUser).fill([user]);
+			marbleEntriesSheetData.push(...list);
+		}
 	}
+
+	const marblesSheetRange = 'Marbles!A:A';
+	await googleSheetsClient.clearSheet(marblesSheetRange);
+	await googleSheetsClient.postBatch(marblesSheetRange, marbleEntriesSheetData.sort());
 }
 
 module.exports = {
@@ -195,5 +201,5 @@ module.exports = {
 	updateUserGuildWeeklies,
 	updateUserCulvert,
 	updateUserFlag,
-	retrieveUserData,
+	updateMarbleSheet,
 };
