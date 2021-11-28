@@ -88,9 +88,8 @@ async function printRaffleDetails(discordMessage) {
 	const raffleDetails = [
 		'We hold a monthly raffle with entries based on your participation.',
 		'The prizes are **20K, 10K, and 10K NX** for **1st, 2nd, and 3rd place in marbles**.',
-		'Culvert: 1 marble',
+		'Culvert: 1 marble (score does not matter)',
 		'Flag Race: 1 marble per 100 points',
-		'Weekly Mission Points: 1 marble per 2 WMP, 5 WMP = 4 marbles',
 	].join('\n');
 
 	await discordMessage.reply(raffleDetails);
