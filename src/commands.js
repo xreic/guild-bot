@@ -103,13 +103,15 @@ async function generateMarblesCSV(discordMessage) {
 	// eslint-disable-next-line no-unused-vars
 	const [_, start, end] = discordMessage.content.split(' ');
 
-	if (!validUser || !start || !end) await executeBotResponses(false, discordMessage, []);
-
-	try {
-		await sheetUtils.updateMarbleSheet(start, end);
-		await executeBotResponses(true, discordMessage, []);
-	} catch (err) {
+	if (!validUser || !start || !end) {
 		await executeBotResponses(false, discordMessage, []);
+	} else {
+		try {
+			await sheetUtils.updateMarbleSheet(start, end);
+			await executeBotResponses(true, discordMessage, []);
+		} catch (err) {
+			await executeBotResponses(false, discordMessage, []);
+		}
 	}
 }
 
