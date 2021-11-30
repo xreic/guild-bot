@@ -96,17 +96,23 @@ async function printRaffleDetails(discordMessage) {
 }
 
 async function generateMarblesCSV(discordMessage) {
+	console.log(0);
 	const validUser = discordMessage.member.roles.cache.some(
 		(role) => role.name === process.env.ADMIN_ROLE,
 	);
+	console.log('0-1');
 
 	// eslint-disable-next-line no-unused-vars
 	const [_, start, end] = discordMessage.content.split(' ');
+	console.log('0-2');
 
 	if (!validUser || !start || !end) {
+		console.log('0-3');
 		await executeBotResponses(false, discordMessage, []);
 	} else {
+		console.log('0-4');
 		try {
+			console.log('0-5');
 			await sheetUtils.updateMarbleSheet(start, end);
 			await executeBotResponses(true, discordMessage, []);
 		} catch (err) {
