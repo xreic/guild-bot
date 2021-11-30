@@ -110,6 +110,7 @@ async function generateMarblesCSV(discordMessage) {
 			await sheetUtils.updateMarbleSheet(start, end);
 			await executeBotResponses(true, discordMessage, []);
 		} catch (err) {
+			console.log('err:', err);
 			await executeBotResponses(false, discordMessage, []);
 		}
 	}
