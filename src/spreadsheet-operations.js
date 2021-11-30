@@ -182,8 +182,10 @@ async function updateMarbleSheet(startDate = new Date(), endDate = new Date()) {
 		const [users, marblesPerUser] = chunkedRanges[i];
 
 		for (let j = 0; j < users.length; j += 1) {
-			const user = users[j][0];
-			const marblesForUser = Number(marblesPerUser[j][0]) || 0;
+			const user = users?.[j]?.[0];
+			if (!user) continue;
+
+			const marblesForUser = Number(marblesPerUser?.[j]?.[0]) || 0;
 
 			const list = Array(marblesForUser).fill([user]);
 			marbleEntriesSheetData.push(...list);
@@ -192,7 +194,9 @@ async function updateMarbleSheet(startDate = new Date(), endDate = new Date()) {
 
 	const marblesSheetRange = 'Marbles!A:A';
 	await googleSheetsClient.clearSheet(marblesSheetRange);
-	await googleSheetsClient.postBatch(marblesSheetRange, marbleEntriesSheetData.sort());
+
+	const sorted = marbleEntriesSheetData.sort();
+	await googleSheetsClient.postBatch(marblesSheetRange, sorted);
 }
 
 module.exports = {
