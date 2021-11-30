@@ -11,6 +11,7 @@ const scopes = ['https://www.googleapis.com/auth/spreadsheets'];
 
 class GoogleSheetsClient {
 	static instance = null;
+	static sheetURL = null;
 
 	static async getInstance() {
 		if (!GoogleSheetsClient.instance) {
@@ -29,6 +30,13 @@ class GoogleSheetsClient {
 		return GoogleSheetsClient.instance;
 	}
 
+	async retrieveSheetURL() {
+		const client = await GoogleSheetsClient.getInstance();
+		const workbookData = await client.spreadsheets.get({ spreadsheetId });
+		const firstSheet = workbookData?.data?.sheets?.[0]?.properties?.sheetId;
+		GoogleSheetsClient.sheetURL = `${process.env.SHEET_URL}/edit#gid=${firstSheet}`;
+	}
+
 	async duplicateTemplateSheet() {
 		try {
 			const client = await GoogleSheetsClient.getInstance();
@@ -45,6 +53,7 @@ class GoogleSheetsClient {
 			};
 
 			await client.spreadsheets.batchUpdate({ spreadsheetId, resource });
+			await this.retrieveSheetURL();
 		} catch (err) {
 			console.log('\nERROR - createNewSheet');
 			console.log(err);

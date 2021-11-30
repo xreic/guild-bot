@@ -1,21 +1,21 @@
-const defaultReplyMessages = {
-	defaultSuccess: [
-		'Your score(s) have been recorded.',
-		'You can double check the spreadsheet if you want. (Dates are UTC Monday)',
-		`${process.env.SHEET_URL}`,
-	],
-	defaultFailure: [
-		'An issue was encountered while recording your score(s).',
-		'Please check the spreadsheet for any issues. (Dates are UTC Monday)',
-		`${process.env.SHEET_URL}`,
-	],
-};
+const { GoogleSheetsClient } = require('./google-sheets-client');
+
+function pullDefaultReplyMessages(isSuccess) {
+	const sheetURL = GoogleSheetsClient.sheetURL || process.env.SHEET_URL;
+	return isSuccess ?
+		[
+			'Your score(s) have been recorded.',
+			'You can double check the spreadsheet if you want. (Dates are UTC Monday)',
+			`${sheetURL}`,
+		] : [
+			'An issue was encountered while recording your score(s).',
+			'Please check the spreadsheet for any issues. (Dates are UTC Monday)',
+			`${sheetURL}`,
+		];
+}
 
 function formatReplyMessage(content, isRequestSuccessful) {
-	if (!content) {
-		const key = isRequestSuccessful ? 'defaultSuccess' : 'defaultFailure';
-		return defaultReplyMessages[key].join('\n');
-	}
+	if (!content) return pullDefaultReplyMessages(isRequestSuccessful).join('\n');
 
 	let formattedContent = content;
 
