@@ -96,35 +96,25 @@ async function printRaffleDetails(discordMessage) {
 }
 
 async function generateMarblesCSV(discordMessage) {
-	console.log(0);
 	const validUser = discordMessage.member.roles.cache.some(
-		(role) => {
-			console.log('role:', role);
-			console.log('role.name:', role.name);
-			return role.name === process.env.ADMIN_ROLE;
-		},
-	);
-	console.log('0-1');
+		(role) => role.id === process.env.ADMIN_ROLE_ID,
+	) || discordMessage.author.id === process.env.ADMIN_ID;
 
 	// eslint-disable-next-line no-unused-vars
 	const [_, start, end] = discordMessage.content.split(' ');
-	console.log('0-2');
-
-	console.log('process.env.ADMIN_ROLE:', process.env.ADMIN_ROLE);
-	console.log('validUser:', validUser);
 
 	if (!validUser || !start || !end) {
-		console.log('0-3');
-		await executeBotResponses(false, discordMessage, []);
+		const reply = !validUser ?
+			[`Only users with the <@&${process.env.ADMIN_ROLE_ID}> role can use this command.`] :
+			['Please enter start and end date ranges to utilize this command (MM/DD/YYYY).'];
+
+		await executeBotResponses(false, discordMessage, reply);
 	} else {
-		console.log('0-4');
 		try {
-			console.log('0-5');
 			await sheetUtils.updateMarbleSheet(start, end);
 			await executeBotResponses(true, discordMessage, []);
 		} catch (err) {
 			await executeBotResponses(false, discordMessage, [err]);
-			throw err;
 		}
 	}
 }
