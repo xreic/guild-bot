@@ -106,6 +106,9 @@ async function generateMarblesCSV(discordMessage) {
 	const [_, start, end] = discordMessage.content.split(' ');
 	console.log('0-2');
 
+	console.log('process.env.ADMIN_ROLE:', process.env.ADMIN_ROLE);
+	console.log('validUser:', validUser);
+
 	if (!validUser || !start || !end) {
 		console.log('0-3');
 		await executeBotResponses(false, discordMessage, []);
