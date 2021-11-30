@@ -97,20 +97,24 @@ async function printRaffleDetails(discordMessage) {
 
 async function generateMarblesCSV(discordMessage) {
 	const validUser = discordMessage.member.roles.cache.some(
-		(role) => role.name === process.env.ADMIN_ROLE,
-	);
+		(role) => role.id === process.env.ADMIN_ROLE_ID,
+	) || discordMessage.author.id === process.env.ADMIN_ID;
 
 	// eslint-disable-next-line no-unused-vars
 	const [_, start, end] = discordMessage.content.split(' ');
 
 	if (!validUser || !start || !end) {
-		await executeBotResponses(false, discordMessage, []);
+		const reply = !validUser ?
+			[`Only users with the <@&${process.env.ADMIN_ROLE_ID}> role can use this command.`] :
+			['Please enter start and end date ranges to utilize this command (MM/DD/YYYY).'];
+
+		await executeBotResponses(false, discordMessage, reply);
 	} else {
 		try {
 			await sheetUtils.updateMarbleSheet(start, end);
 			await executeBotResponses(true, discordMessage, []);
 		} catch (err) {
-			await executeBotResponses(false, discordMessage, []);
+			await executeBotResponses(false, discordMessage, [err]);
 		}
 	}
 }
