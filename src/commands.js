@@ -98,7 +98,11 @@ async function printRaffleDetails(discordMessage) {
 async function generateMarblesCSV(discordMessage) {
 	console.log(0);
 	const validUser = discordMessage.member.roles.cache.some(
-		(role) => role.name === process.env.ADMIN_ROLE,
+		(role) => {
+			console.log('role:', role);
+			console.log('role.name:', role.name);
+			return role.name === process.env.ADMIN_ROLE;
+		},
 	);
 	console.log('0-1');
 
