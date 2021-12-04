@@ -31,14 +31,10 @@ function getUTCMondayOfWeekFromDate(date) {
 	 * 	Sunday's day value is 0, which is falsy
 	 */
 	const dayOfRequestedDate = diffFromMonday[requestedDate.getUTCDay()];
+	const mondayDay = requestedDate.getUTCDate() - dayOfRequestedDate || 1;
+	requestedDate.setDate(mondayDay);
 
-	const year = requestedDate.getFullYear();
-	// getMonth returns the value of the month in a 0-index fashion
-	const month = requestedDate.getMonth() + 1;
-	// Getting the day for the Monday for the week of the requested date
-	const day = requestedDate.getUTCDate() - dayOfRequestedDate || 1;
-
-	return `${year}/${month}/${day}`;
+	return `${requestedDate.getFullYear()}/${requestedDate.getMonth() + 1}/${requestedDate.getDate()}`;
 }
 
 /**
