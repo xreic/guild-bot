@@ -10,9 +10,8 @@ const { generateSheetRange, getAllUTCMondaysBetweenWeeks } = require('./utils');
  * @param {Message.author} authorData message.author object from the Discord Message object
  */
 async function addUserToSheet(row, authorData) {
-	const range = generateSheetRange(`A${row}:B${row}`);
-	const value = [[authorData.id, authorData.username]];
-	await googleSheetsClient.postBatch(range, value);
+	const range = generateSheetRange(`A${row}`);
+	await googleSheetsClient.post(range, authorData.id);
 }
 
 /**
@@ -64,7 +63,7 @@ async function updateUserGuildWeeklies(row, value = '0') {
 	}
 
 	// If the value comes in as a negative number, then change it to 0
-	const insertValue = Math.max(Math.floor(convertedValue), 0);
+	const insertValue = convertedValue < 0 ? 0 : Math.floor(convertedValue);
 
 	const cell = generateSheetRange(`C${row}`);
 	await googleSheetsClient.post(cell, insertValue);
@@ -89,7 +88,7 @@ async function updateUserCulvert(row, value = '0') {
 	}
 
 	// If the value comes in as a negative number, then reset it to 0
-	const insertValue = Math.max(Math.floor(value), 0);
+	const insertValue = convertedValue < 0 ? 0 : Math.floor(value);
 
 	const cell = generateSheetRange(`D${row}`);
 	await googleSheetsClient.post(cell, insertValue);

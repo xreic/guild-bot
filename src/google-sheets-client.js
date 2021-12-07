@@ -89,8 +89,9 @@ class GoogleSheetsClient {
 		return data;
 	}
 
+	// Assume that a value is always passed, because I don't want to deal with logic for parsing the number 0
 	async post(range, value) {
-		if (!range || !_.isSafeInteger(value)) return;
+		if (!range) return;
 
 		const client = await GoogleSheetsClient.getInstance();
 
