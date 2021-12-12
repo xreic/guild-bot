@@ -34,9 +34,6 @@ class GoogleSheetsClient {
 		const client = await GoogleSheetsClient.getInstance();
 		const workbookData = await client.spreadsheets.get({ spreadsheetId });
 
-		console.log('retrieveSheetURL');
-		console.log('workbookData?.data?.sheets:', workbookData?.data?.sheets);
-
 		const firstSheet = workbookData?.data?.sheets?.[0]?.properties?.sheetId;
 		GoogleSheetsClient.sheetURL = `${process.env.SHEET_URL}/edit#gid=${firstSheet}`;
 	}
