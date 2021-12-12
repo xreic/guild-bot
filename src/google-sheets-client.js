@@ -38,6 +38,7 @@ class GoogleSheetsClient {
 		console.log('workbookData?.data?.sheets:', workbookData?.data?.sheets);
 
 		const firstSheet = workbookData?.data?.sheets?.[0]?.properties?.sheetId;
+		console.log('link:', `${process.env.SHEET_URL}/edit#gid=${firstSheet}`);
 		GoogleSheetsClient.sheetURL = `${process.env.SHEET_URL}/edit#gid=${firstSheet}`;
 	}
 
