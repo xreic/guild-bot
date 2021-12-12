@@ -33,6 +33,10 @@ class GoogleSheetsClient {
 	async retrieveSheetURL() {
 		const client = await GoogleSheetsClient.getInstance();
 		const workbookData = await client.spreadsheets.get({ spreadsheetId });
+
+		console.log('retrieveSheetURL');
+		console.log('workbookData?.data?.sheets:', workbookData?.data?.sheets);
+
 		const firstSheet = workbookData?.data?.sheets?.[0]?.properties?.sheetId;
 		GoogleSheetsClient.sheetURL = `${process.env.SHEET_URL}/edit#gid=${firstSheet}`;
 	}
@@ -75,6 +79,7 @@ class GoogleSheetsClient {
 		 * 		so all further operations do not necessitate the usage of "duplicateTemplateSheet"
 		 */
 		const workbookData = await client.spreadsheets.get({ spreadsheetId });
+		await this.retrieveSheetURL();
 		if (shouldMakeNewSpreadsheet(workbookData)) await this.duplicateTemplateSheet();
 
 		const { data } = await client.spreadsheets.values.get({ spreadsheetId, range });
@@ -86,6 +91,7 @@ class GoogleSheetsClient {
 
 		const client = await GoogleSheetsClient.getInstance();
 		const { data } = await client.spreadsheets.values.batchGet({ spreadsheetId, ranges });
+
 		return data;
 	}
 
