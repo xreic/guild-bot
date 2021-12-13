@@ -20,26 +20,6 @@ async function retrieveArgs(message) {
 }
 
 /**
- * Updates the user's weekly mission points for the week
- *
- * No plans on adding the functionality to change other weeks just
- * 	because guild members are dumb
- *
- * @param {Message} discordMessage Discord message the user sent
- */
-async function updateWeeklyCommand(discordMessage) {
-	try {
-		const { rowIdx, value } = await retrieveArgs(discordMessage);
-		if (value === null || value === undefined) throw new Error('Please enter a number (0 - 5).');
-
-		await sheetUtils.updateUserGuildWeeklies(rowIdx, value);
-		await executeBotResponses(true, discordMessage);
-	} catch (err) {
-		await executeBotResponses(false, discordMessage, err);
-	}
-}
-
-/**
  * Updates the user's culvert score for the week
  *
  * No plans on adding the functionality to change other weeks just
@@ -120,7 +100,6 @@ async function generateMarblesCSV(discordMessage) {
 }
 
 const commandMap = {
-	'!weekly': updateWeeklyCommand,
 	'!culvert': updateCulvertCommand,
 	'!flag': updateFlagCommand,
 	'!raffle': printRaffleDetails,
