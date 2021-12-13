@@ -103,10 +103,9 @@ async function updateUserFlag(row, value = '0') {
 
 /**
  * Updates all three of the user's scores for the week
- * The expected message is: @bot <1> <2> <3>
- * 		1. Weekly mission points (defaults to 0)
- * 		2. Culvert score (defaults to 0)
- * 		3. Flag race score (defaults to 0)
+ * The expected message is: @bot <1> <2>
+ * 		1. Culvert score (defaults to 0)
+ * 		2. Flag race score (defaults to 0)
  *
  * No plans on adding the functionality to change other weeks just
  * 	because guild members are dumb
@@ -118,8 +117,7 @@ async function updateUserScores(message) {
 	 * 1. Removes the bot mention
 	 * 2. Trims whitespace
 	 * 3. Convert the string into an array of arguments
-	 * 3. Get the relevant arguments
-	 * 		Weekly mission points, culvert, and flag
+	 * 3. Get the relevant arguments (Culvert and Flag)
 	 */
 	const rawUsersScores = message.content
 		.replace(`<@!${process.env.DISCORD_CLIENT_ID}> `, '')
