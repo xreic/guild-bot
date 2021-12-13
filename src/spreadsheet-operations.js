@@ -40,35 +40,6 @@ async function findRowUserIsLocated(message, possibleDate) {
 	if (usersRow === -1) await addUserToSheet(data.length + firstRowIndex, message.author);
 	return (usersRow !== -1 ? usersRow : data.length) + firstRowIndex;
 }
-
-/**
- * Updates the user's amount of Weekly Mission Points accrued for the current week
- *
- * No plans on adding the functionality to change other weeks just
- * 	because guild members are dumb
- *
- * @param {*} row the row for the user being updated
- * @param {*} value the new value
- */
-async function updateUserGuildWeeklies(row, value = '0') {
-	// Convert the user input value into a number
-	const convertedValue = +value;
-
-	if (Number.isNaN(convertedValue)) {
-		// Users should not be able to enter non-number inputs
-		throw new Error(`\`${value}\` is not valid for this command. Please enter a number between 0 - 5.`);
-	} else if (convertedValue > 5) {
-		// Users should not be able to enter an amount that is greater than the weekly max (5)
-		throw new Error(`\`${value}\` is greater than the max (5) amount of weekly mission points you can accrue in one week.`);
-	}
-
-	// If the value comes in as a negative number, then change it to 0
-	const insertValue = convertedValue < 0 ? 0 : Math.floor(convertedValue);
-
-	const cell = generateSheetRange(`C${row}`);
-	await googleSheetsClient.post(cell, insertValue);
-}
-
 /**
  * Updates the user's Culvert score for the current week
  *
@@ -90,7 +61,7 @@ async function updateUserCulvert(row, value = '0') {
 	// If the value comes in as a negative number, then reset it to 0
 	const insertValue = convertedValue < 0 ? 0 : Math.floor(value);
 
-	const cell = generateSheetRange(`D${row}`);
+	const cell = generateSheetRange(`C${row}`);
 	await googleSheetsClient.post(cell, insertValue);
 }
 
@@ -120,7 +91,7 @@ async function updateUserFlag(row, value = '0') {
 		].join('\n'));
 	}
 
-	const cell = generateSheetRange(`E${row}`);
+	const cell = generateSheetRange(`D${row}`);
 
 	/**
 	 * Convert value to a number, because in the "post" method
@@ -154,14 +125,13 @@ async function updateUserScores(message) {
 		.replace(`<@!${process.env.DISCORD_CLIENT_ID}> `, '')
 		.trim()
 		.split(' ')
-		.slice(0, 3);
+		.slice(0, 2);
 
 	const rowIdx = await findRowUserIsLocated(message);
 
 	const promises = [
-		updateUserGuildWeeklies(rowIdx, rawUsersScores[0]),
-		updateUserCulvert(rowIdx, rawUsersScores[1]),
-		updateUserFlag(rowIdx, rawUsersScores[2]),
+		updateUserCulvert(rowIdx, rawUsersScores[0]),
+		updateUserFlag(rowIdx, rawUsersScores[1]),
 	];
 
 	const resolvedPromises = await Promise.allSettled(promises);
@@ -170,7 +140,7 @@ async function updateUserScores(message) {
 
 async function updateMarbleSheet(startDate = new Date(), endDate = new Date()) {
 	const sheets = getAllUTCMondaysBetweenWeeks(startDate, endDate);
-	const ranges = sheets.map((sheet) => generateSheetRange(['B2:B', 'H2:H'], sheet));
+	const ranges = sheets.map((sheet) => generateSheetRange(['B2:B', 'G2:G'], sheet));
 	const { valueRanges } = await googleSheetsClient.batchGet(ranges);
 
 	const chunkedRanges = _.chunk(valueRanges.map((range) => range.values), 2);
@@ -200,7 +170,6 @@ async function updateMarbleSheet(startDate = new Date(), endDate = new Date()) {
 module.exports = {
 	findRowUserIsLocated,
 	updateUserScores,
-	updateUserGuildWeeklies,
 	updateUserCulvert,
 	updateUserFlag,
 	updateMarbleSheet,
