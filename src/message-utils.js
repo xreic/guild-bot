@@ -34,15 +34,16 @@ function formatReplyMessage(content, isRequestSuccessful) {
  * @param {Boolean} isRequestSuccessful boolean indicating if
  * 	the execution of command(s) were successful
  * @param {Message} discordMessage Discord message the user sent
- * @param {[String]} [replyMessage] an array of strings to concat
+ * @param {[String]} [_replyMessage] an array of strings to concat
  * 	with \n to be sent as a reply to the user
  */
-async function executeBotResponses(isRequestSuccessful, discordMessage, replyMessage) {
-	const botReply = formatReplyMessage(replyMessage, isRequestSuccessful);
+// eslint-disable-next-line no-unused-vars
+async function executeBotResponses(isRequestSuccessful, discordMessage, _replyMessage) {
+	// const botReply = formatReplyMessage(replyMessage, isRequestSuccessful);
 
 	await Promise.allSettled([
 		discordMessage.react(isRequestSuccessful ? '✅' : '❌'),
-		discordMessage.reply(botReply),
+		// discordMessage.reply(botReply),
 	]);
 }
 
