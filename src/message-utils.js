@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { GoogleSheetsClient } = require('./google-sheets-client');
 
 function pullDefaultReplyMessages(isSuccess) {
@@ -34,11 +35,10 @@ function formatReplyMessage(content, isRequestSuccessful) {
  * @param {Boolean} isRequestSuccessful boolean indicating if
  * 	the execution of command(s) were successful
  * @param {Message} discordMessage Discord message the user sent
- * @param {[String]} [_replyMessage] an array of strings to concat
+ * @param {[String]} [replyMessage] an array of strings to concat
  * 	with \n to be sent as a reply to the user
  */
-// eslint-disable-next-line no-unused-vars
-async function executeBotResponses(isRequestSuccessful, discordMessage, _replyMessage) {
+async function executeBotResponses(isRequestSuccessful, discordMessage, replyMessage) {
 	// const botReply = formatReplyMessage(replyMessage, isRequestSuccessful);
 
 	await Promise.allSettled([
