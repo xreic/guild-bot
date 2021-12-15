@@ -1,5 +1,6 @@
 const { executeBotResponses } = require('./message-utils');
 const sheetUtils = require('./spreadsheet-operations');
+const sunnySundayJSON = require('./sunny-sunday.json');
 
 /**
  * Function to remove the repetitiveness of having to get the
@@ -99,11 +100,22 @@ async function generateMarblesCSV(discordMessage) {
 	}
 }
 
+async function replyWithSunnySunday(discordMessage) {
+	const thread = await discordMessage.startThread({ name: 'Sunny Sunday', autoArchiveDuration: 60 });
+
+	for (let i = 0; i < sunnySundayJSON.length; i += 1) {
+		const sunnySundayWeek = sunnySundayJSON[i].join('\n');
+		// eslint-disable-next-line no-await-in-loop
+		await thread.send(sunnySundayWeek);
+	}
+}
+
 const commandMap = {
 	'!culvert': updateCulvertCommand,
 	'!flag': updateFlagCommand,
 	'!raffle': printRaffleDetails,
 	'!marbles': generateMarblesCSV,
+	'!sunnysunday': replyWithSunnySunday,
 };
 
 module.exports = {
