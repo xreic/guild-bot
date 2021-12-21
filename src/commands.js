@@ -111,6 +111,7 @@ async function replyWithSunnySunday(discordMessage) {
 }
 
 const commandMap = {
+	'!gpq': updateCulvertCommand,
 	'!culvert': updateCulvertCommand,
 	'!flag': updateFlagCommand,
 	'!raffle': printRaffleDetails,
